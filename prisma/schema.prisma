@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int            @id @default(autoincrement())
+  email           String         @unique
+  facebookUserId  String?
+  facebookEmail   String?
+  facebookPicture String?
+  name            String?
+  password        String
+  createdAt       DateTime       @default(now())
+  updatedUt       DateTime       @updatedAt
+  pages           FacebookPage[]
+}
+
+model FacebookPage {
+  id             Int      @id @default(autoincrement())
+  pageId         String   @unique
+  name           String?
+  accessToken    String
+  userId         Int?
+  user           User?    @relation(fields: [userId], references: [id])
+  facebookUserId String?
+  createdAt      DateTime @default(now())
+  updatedUt      DateTime @updatedAt
+}
