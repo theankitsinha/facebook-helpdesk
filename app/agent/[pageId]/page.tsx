@@ -1,5 +1,14 @@
-import AgentPage from "@/components/AgentPage";
+import HelpDeskPage from "@/components/HelpDeskPage";
+import React from "react";
+import {Metadata} from "next";
 
+export const metadata: Metadata = {
+    title: 'Facebook Page',
+};
 export default function Page({params}: { params: { pageId: string } }) {
-    return (<AgentPage pageId={params.pageId}/>)
+    return (
+        <>
+            <HelpDeskPage pageId={params.pageId.toString()}/>
+        </>
+    )
 }

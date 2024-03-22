@@ -3,6 +3,54 @@ export type AccountGetApiResponse = {
     paging: Paging
 }
 
+export interface MessageResponse {
+    client?: any
+    senderId: string
+    pageId: number
+    messages: Message[]
+}
+
+export interface SinglePageType {
+    id: number
+    pageId: string
+    name: string
+    accessToken: string
+    userId: number
+    facebookUserId: any
+    createdAt: string
+    updatedUt: string
+}
+
+
+export interface Chat {
+    senderId: string
+    pageId: number
+    messages: Message[]
+    client: Client
+}
+
+export interface Client {
+    name: string
+    first_name: string
+    last_name: string
+    profile_pic: string
+    id: string
+}
+
+export interface ChatMessages {
+    senderName: string
+    senderPicture: string
+    senderId: string
+    time: string
+    messages: string[]
+}
+
+export type Message = {
+    message: string
+    senderId: string
+    time: string
+}
+
 export type AccountPageResponse = {
     access_token: string
     category: string

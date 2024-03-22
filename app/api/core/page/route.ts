@@ -1,20 +1,30 @@
-import {NextResponse} from "next/server";
+import {NextRequest, NextResponse} from "next/server";
 import prisma from "@/lib/prisma";
 import {nextAuthOptions} from "@/utils/nextAuth/nextAuthOptions";
 import {getServerSession} from "next-auth";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
     const session = await getServerSession(nextAuthOptions);
-    const facebookPages = await prisma.facebookPage.findMany(
-        {
+    let pageId = request.nextUrl.searchParams.get("pageId");
+    let facebookPages;
+    if (pageId) {
+        facebookPages = await prisma.facebookPage.findFirst({
             where: {
-                userId: Number(session.id),
+                pageId: pageId,
             }
         });
+    } else {
+        facebookPages = await prisma.facebookPage.findMany(
+            {
+                where: {
+                    userId: Number(session.id),
+                }
+            });
+    }
     return NextResponse.json(facebookPages);
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     const session = await getServerSession(nextAuthOptions);
     const res = await request.json();
     const facebookPage = await prisma.facebookPage.create({
@@ -28,7 +38,7 @@ export async function POST(request: Request) {
     return NextResponse.json({status: true, facebookPage});
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
     const session = await getServerSession(nextAuthOptions);
     const res = await request.json();
     const facebookPage = await prisma.facebookPage.delete({

@@ -23,7 +23,6 @@ export const nextAuthOptions = {
             },
             //@ts-ignore
             async authorize(credentials) {
-                console.log(credentials);
                 if (!credentials || !credentials.email || !credentials.password || credentials.password.toString().trim() == '' || credentials.email.toString().trim() == '') {
                     throw new Error(JSON.stringify({
                         errors: 'Credentials are not filled',
