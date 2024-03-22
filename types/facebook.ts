@@ -8,6 +8,7 @@ export type AccountGetApiResponse = {
 export interface MessageResponse {
     client?: any
     senderId: string
+    clientId: string
     pageId: string
     messages: Message[]
 }
@@ -43,12 +44,14 @@ export interface ChatMessages {
     senderName: string
     senderPicture: string
     senderId: string
+    clientId: string
     time: string
     messages: string[]
 }
 
 export type Message = {
     message: string
+    clientId: string
     senderId: string
     time: string | DateTime | Date
 }

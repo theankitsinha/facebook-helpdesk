@@ -1,5 +1,5 @@
 import React from "react";
-import Icon from "@/public/assets/richpanel_icon.png";
+import Icon from "@/public/assets/rich-panel.png";
 import Inbox from "@/public/assets/inbox.png";
 import InboxSelected from "@/public/assets/inbox_selected.png";
 import LineChart from "@/public/assets/line_chart.png";
@@ -9,28 +9,23 @@ import FriendsSelected from "@/public/assets/friends_selected.png";
 import DefaultUserImage from "@/public/assets/user.png";
 import {LogOut} from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import {signOut, useSession} from "next-auth/react";
+import {signOut} from "next-auth/react";
+import {cn} from "@/lib/utils";
 
 const Sidebar = () => {
-    const {data: session, status} = useSession();
-
     const sidebarOps = [
         {
-            name: "chatportal",
-            link: "/helpdesk",
+            active: true,
             icon: Inbox,
             iconSelected: InboxSelected,
         },
         {
-            name: "manage-page",
-            link: "/helpdesk/manage-page",
+            active: false,
             icon: Friends,
             iconSelected: FriendsSelected,
         },
         {
-            name: "analysis",
-            link: "/helpdesk/analysis",
+            active: false,
             icon: LineChart,
             iconSelected: LineChartSelected,
         },
@@ -40,14 +35,16 @@ const Sidebar = () => {
         <div className="flex flex-col items-center gap-12 p-4 h-full">
             {/* icon */}
             <div className="flex  items-center justify-center w-full">
-                <Image src={Icon} className="h-8 w-8" alt={'richpanel-icon'}/>
+                <Image src={Icon} className="h-12 w-12 rounded" alt={'richpanel-icon'}/>
             </div>
 
             <div className="flex flex-col gap-10">
-                {sidebarOps?.map((op) => (
-                    <Link key={op?.name} href={op?.link}>
-                        <Image alt={op?.name} src={op?.icon} className="h-6 w-6"/>
-                    </Link>
+                {sidebarOps?.map((singleSidebarOption, index) => (
+                    <span key={index} className={cn("p-4", singleSidebarOption.active ? 'bg-white rounded-xl' : '')}>
+                        <Image alt={"option" + index} width={20} height={20}
+                               src={singleSidebarOption.active ? singleSidebarOption.iconSelected : singleSidebarOption.icon}
+                               className="h-6 w-6"/>
+                    </span>
                 ))}
             </div>
 

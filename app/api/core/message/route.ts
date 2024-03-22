@@ -20,13 +20,16 @@ export async function GET(request: NextRequest) {
     const messagesGroupedBySenders = allMessages.reduce((acc: any, item: any) => {
         if (!acc[item.senderId]) {
             acc[item.senderId] = {
+                clientId: item.pageId,
                 senderId: item.senderId,
                 pageId: item.pageId,
                 messages: [],
             };
         }
+
         acc[item.senderId].messages.push({
             message: item.message,
+            clientId: item.pageId,
             senderId: item.senderId,
             time: item.createdAt,
         });

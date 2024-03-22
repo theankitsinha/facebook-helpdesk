@@ -35,7 +35,6 @@ export default function HelpDeskPage({pageId}: { pageId: string }) {
             }
 
         });
-        console.log(res);
     };
     useEffect(() => {
         getPageDetails();

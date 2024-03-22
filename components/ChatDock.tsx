@@ -19,7 +19,8 @@ const SelfMessage = ({chat}: { chat: ChatMessages }) => {
                     ))}
                 </div>
                 <div className="mt-auto">
-                    <Image alt="user" src={chat.senderPicture} className="h-10 w-10"/>
+                    <Image alt="user" src={chat.senderPicture} width={50} height={50}
+                           className="rounded-full h-10 w-10"/>
                 </div>
             </div>
             <div className="flex gap-2 justify-end mr-14 mt-2 ">
@@ -39,7 +40,8 @@ const OthersMessage = ({chat}: { chat: ChatMessages }) => {
 
             <div className="flex gap-4 w-full justify-start">
                 <div className="mt-auto">
-                    <Image alt="user" src={chat.senderPicture} className="h-10 w-10"/>
+                    <Image alt="user" src={chat.senderPicture} width={50} height={50}
+                           className=" rounded-full h-10 w-10"/>
                 </div>
                 <div className="flex flex-col gap-4 items-start  max-w-[60%]">
                     {chat?.messages?.map((message, index) => (
@@ -122,6 +124,7 @@ const ChatDock = ({chat, updateChat, pageDetails}: { chat: Chat, updateChat: any
             senderName: clientName,
             senderPicture: clientPicture,
             senderId: chat.messages[0].senderId,
+            clientId: chat.messages[0].clientId,
             time: chat.messages[0]?.time,
             messages: [chat.messages[0]?.message],
         };
@@ -134,8 +137,9 @@ const ChatDock = ({chat, updateChat, pageDetails}: { chat: Chat, updateChat: any
                 } else {
                     selectedChatMessage.push(currMessageGroup);
                     currMessageGroup = {
-                        senderName: item.senderId === pageId ? pageName : clientName,
+                        senderName: item.senderId === item.clientId ? pageName : clientName,
                         senderId: item.senderId,
+                        clientId: item.clientId,
                         senderPicture: clientPicture,
                         time: item.time,
                         messages: [item.message],
@@ -144,6 +148,7 @@ const ChatDock = ({chat, updateChat, pageDetails}: { chat: Chat, updateChat: any
             }
         });
         selectedChatMessage.push(currMessageGroup);
+        console.log(selectedChatMessage);
         //@ts-ignore
         setMessages(selectedChatMessage);
     };
@@ -169,7 +174,7 @@ const ChatDock = ({chat, updateChat, pageDetails}: { chat: Chat, updateChat: any
                 className="flex flex-col items-start gap-2 pb-20 relative  p-3 overflow-scroll h-[80%]"
             >
                 {messages?.map((data, i) => {
-                    if (data.senderId === pageDetails.pageId) {
+                    if (data.senderId === data.clientId) {
                         return <SelfMessage key={i} chat={data}/>;
                     } else {
                         return <OthersMessage key={i} chat={data}/>;

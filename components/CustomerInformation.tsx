@@ -1,18 +1,20 @@
 import React from "react";
-import UserImageDefault from "@/public/assets/user.png";
 import {PhoneCall, User} from "lucide-react";
 import Image from "next/image";
 import NewButton from "@/components/ui/buttonNew";
 import Card from "@/components/ui/card";
+import {Chat} from "@/types/facebook";
 
-const CustomerInformation = ({chat}: { chat: any }) => {
+const CustomerInformation = ({chat}: { chat: Chat }) => {
     return (
         <div className="flex flex-col w-full h-full border-l">
             <div className="flex flex-col gap-2 w-full items-center p-10 border-b">
                 <Image
-                    src={UserImageDefault}
-                    alt="User"
-                    className="w-20 h-20 rounded-full items-center"
+                    src={chat.client.profile_pic}
+                    width={50}
+                    height={50}
+                    alt={chat.client.name}
+                    className="w-40 h-40 rounded-full items-center"
                 />
                 <h1 className="text-xl font-medium mt-3">{chat?.client?.name}</h1>
                 <div className="flex items-center gap-2 opacity-60">

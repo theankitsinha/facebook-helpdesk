@@ -7,6 +7,8 @@ import ChatDock from "@/components/ChatDock";
 import CustomerInformation from "@/components/CustomerInformation";
 import {Chat, MessageResponse, SinglePageType} from "@/types/facebook";
 import {fbGraphApi} from "@/lib/facebook";
+import userImage from "@/public/assets/user.png";
+
 
 const ChatPortal = ({pageId, pageDetails}: { pageId: string, pageDetails: SinglePageType }) => {
     const [chats, setChats] = useState<Chat[]>();
@@ -15,8 +17,9 @@ const ChatPortal = ({pageId, pageDetails}: { pageId: string, pageDetails: Single
     const socketRef = useRef();
 
     const getClientDetails = async (chat: MessageResponse) => {
+
+        const clientId = chat.senderId;
         try {
-            const clientId = chat.senderId;
             const res = await fbGraphApi.get(`/${clientId}`, {
                 params: {
                     access_token: pageDetails?.accessToken,
@@ -24,17 +27,17 @@ const ChatPortal = ({pageId, pageDetails}: { pageId: string, pageDetails: Single
                 },
             });
             chat.client = res.data;
-            return chat;
         } catch (error) {
-            // @ts-ignore
-            const errorCode = error?.response?.data?.error?.code;
-            if (errorCode === 190) {
-                showError("Access token expired ... please reconnect to facebook page");
-                return;
-            }
-            // @ts-ignore
-            showError(error?.message);
+            chat.client = {
+                first_name: "Facebook",
+                id: clientId,
+                last_name: "User",
+                name: "Facebook User",
+                profile_pic: userImage
+            };
         }
+
+        return chat;
     };
 
     const updateChat = async (clientId: string, senderId: string, message: string) => {
@@ -78,6 +81,7 @@ const ChatPortal = ({pageId, pageDetails}: { pageId: string, pageDetails: Single
                     },
                 ],
             };
+            //@ts-ignore
             const newChatWithDetails = await getClientDetails(newChat);
             //@ts-ignore
             setChats((prev) => [...prev, newChatWithDetails]);
@@ -87,12 +91,13 @@ const ChatPortal = ({pageId, pageDetails}: { pageId: string, pageDetails: Single
     const getAllMessages = async () => {
         setLoader(true);
         try {
-            const res = await fetch('/api/core/message?pageId=' + pageDetails.id);
+            const res = await fetch('/api/core/message?pageId=' + pageDetails.pageId);
             const fetchRes: MessageResponse[] = await res.json();
             const allChatsNamedPromises = fetchRes.map((chat) => {
                 return getClientDetails(chat);
             });
             const allChatsWithClientDetails = await Promise.all(allChatsNamedPromises);
+            console.log("all chats: " + JSON.stringify(allChatsWithClientDetails));
             if (allChatsWithClientDetails) {
                 //@ts-ignore
                 setChats(allChatsWithClientDetails);
