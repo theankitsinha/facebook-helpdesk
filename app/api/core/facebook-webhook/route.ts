@@ -1,4 +1,5 @@
 import {NextRequest, NextResponse} from "next/server";
+import prisma from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
     // AUTH
@@ -29,16 +30,28 @@ export async function GET(req: NextRequest) {
 export const POST = async (req: Request, res: Response) => {
     try {
         const body = await req.json();
-        await fetch('https://webhook.site/e0e9f526-575d-4e8c-a435-f4ed54c26d82', {
-            method: "POST",
-            body: JSON.stringify(body)
-        });
-        console.log('WEBHOOK: ', body);
-        if (body.object === "page") {
+        try {
+            if (body.object === "page" && body?.entry) {
+                const entry = body?.entry[0];
+                const senderId = entry?.messaging[0]?.sender?.id;
+                const pageId = entry?.messaging[0]?.recipient?.id;
+                const message = entry?.messaging[0]?.message?.text;
+                const insertIntoDB = prisma.message.create({
+                    data: {
+                        message: message,
+                        senderId: senderId,
+                        facebookUserId: senderId,
+                        pageId: pageId,
+                        // userId: userId
+                    }
+                });
+            }
             return new NextResponse('EVENT_RECEIVED', {status: 2000});
+        } catch (error) {
+            console.log(error);
         }
-
         return new NextResponse('Not Found', {status: 404})
+
     } catch (error) {
         return new NextResponse('Not Found', {status: 404})
     }
