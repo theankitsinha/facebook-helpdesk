@@ -31,7 +31,7 @@ export const POST = async (req: Request, res: Response) => {
     try {
         const body = await req.json();
         try {
-            if (body.object === "page" && body?.entry) {
+            if (body?.entry) {
                 const entry = body?.entry[0];
                 const senderId = entry?.messaging[0]?.sender?.id;
                 const pageId = entry?.messaging[0]?.recipient?.id;
