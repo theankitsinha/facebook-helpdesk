@@ -1,3 +1,5 @@
+import {DateTime} from "next-auth/providers/kakao";
+
 export type AccountGetApiResponse = {
     data: AccountPageResponse[]
     paging: Paging
@@ -6,7 +8,7 @@ export type AccountGetApiResponse = {
 export interface MessageResponse {
     client?: any
     senderId: string
-    pageId: number
+    pageId: string
     messages: Message[]
 }
 
@@ -24,7 +26,7 @@ export interface SinglePageType {
 
 export interface Chat {
     senderId: string
-    pageId: number
+    pageId: string
     messages: Message[]
     client: Client
 }
@@ -48,7 +50,7 @@ export interface ChatMessages {
 export type Message = {
     message: string
     senderId: string
-    time: string
+    time: string | DateTime | Date
 }
 
 export type AccountPageResponse = {

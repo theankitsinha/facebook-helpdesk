@@ -1,3 +1,4 @@
+import HelpDeskPage from "@/components/HelpDeskPage";
 import React from "react";
 import {Metadata} from "next";
 
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
 export default function Page({params}: { params: { pageId: string } }) {
     return (
         <>
-            {/*<HelpDeskPage pageId={params.pageId.toString()}/>*/}
+            <HelpDeskPage pageId={params.pageId.toString()}/>
         </>
     )
 }
