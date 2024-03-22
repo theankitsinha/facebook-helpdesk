@@ -7,7 +7,10 @@
     "dev-https": "next dev --experimental-https",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "bgen": "prisma generate && next build",
+    "prisma-pull": "prisma db pull --force",
+    "prisma-generate": "prisma generate"
   },
   "dependencies": {
     "@greatsumini/react-facebook-login": "^3.3.3",
