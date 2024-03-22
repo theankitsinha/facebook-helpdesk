@@ -36,7 +36,7 @@ export const POST = async (req: Request, res: Response) => {
                 const senderId = entry?.messaging[0]?.sender?.id;
                 const pageId = entry?.messaging[0]?.recipient?.id;
                 const message = entry?.messaging[0]?.message?.text;
-                const insertIntoDB = prisma.message.create({
+                const insertIntoDB = await prisma.message.create({
                     data: {
                         message: message,
                         senderId: senderId,
