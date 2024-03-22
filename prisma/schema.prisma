@@ -24,16 +24,31 @@ model User {
   createdAt       DateTime       @default(now())
   updatedUt       DateTime       @updatedAt
   pages           FacebookPage[]
+  Message         Message[]
 }
 
 model FacebookPage {
-  id             Int      @id @default(autoincrement())
-  pageId         String   @unique
+  id             Int       @id @default(autoincrement())
+  pageId         String    @unique
   name           String?
   accessToken    String
   userId         Int?
-  user           User?    @relation(fields: [userId], references: [id])
+  user           User?     @relation(fields: [userId], references: [id])
   facebookUserId String?
-  createdAt      DateTime @default(now())
-  updatedUt      DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedUt      DateTime  @updatedAt
+  Message        Message[]
+}
+
+model Message {
+  id             Int           @id @default(autoincrement())
+  message        String?
+  senderId       String
+  facebookUserId String?
+  userId         Int?
+  pageId         Int?
+  user           User?         @relation(fields: [userId], references: [id])
+  page           FacebookPage? @relation(fields: [pageId], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedUt      DateTime      @updatedAt
 }

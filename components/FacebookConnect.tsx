@@ -4,6 +4,7 @@ import FacebookLogin from "@greatsumini/react-facebook-login";
 import axios from "axios";
 import {AccountPageResponse, PageResponse} from "@/types/facebook";
 import Link from "next/link";
+import Button from "@/components/ui/button";
 
 export default function FacebookConnect() {
     const [loading, setLoading] = useState(false);
@@ -12,24 +13,29 @@ export default function FacebookConnect() {
     const [connectedPages, setConnectedPages] = useState([]);
     const [notConnectedPages, setNotConnectedPages] = useState([]);
     const [action, setAction] = useState("Action");
-    const [userAccessToken, setUserAccessToken] = useState(process.env.NEXT_PUBLIC_APITOKEN);
+    const [userAccessToken, setUserAccessToken] = useState("");
     const [userFacebookId, setUserFacebookId] = useState("")
 
     const appId = process.env.NEXT_PUBLIC_FACEBOOK_ID ?? '';
 
     const handleResponse = async (data: any) => {
         try {
-            console.log('Facebook login response:', data);
             setUserAccessToken(data.accessToken);
             setUserFacebookId(data.userId);
             setLoading(false);
             setPageStatus('pages');
-            // let exists = await fetch("/api/core/check", {
-            //     method: 'POST',
-            //     body: JSON.stringify(data)
-            // });
         } catch (error) {
-            alert("Submitting form failed!");
+            alert("Facebook login failed!");
+        }
+    }
+    const updateProfile = async (data: any) => {
+        try {
+            await fetch("/api/core/user", {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+        } catch (error) {
+            console.log("Profile update failed: ", error);
         }
     }
     useEffect(() => {
@@ -65,6 +71,9 @@ export default function FacebookConnect() {
         try {
             const response = await fetch('/api/core/page');
             const data = await response.json();
+            if (data.length > 0) {
+                setPageStatus('pages');
+            }
             setConnectedPages(data);
         } catch (error) {
             console.error('Error fetching connected pages:', error);
@@ -117,6 +126,9 @@ export default function FacebookConnect() {
             setLoading(false);
             await fetchConnectedPages();
             setConnectedPages((prev) => prev.filter((connectedPage: any) => connectedPage.id !== pageId));
+            if (connectedPages.length == 0) {
+                setPageStatus('default');
+            }
             alert("Page Disconnected Successfully!");
         } catch (error) {
             console.log(error);
@@ -126,123 +138,112 @@ export default function FacebookConnect() {
 
     return (
         <>
-            <div className="dashboard-screen container mt-5">
-                {loading && (
-                    <div className="loading-overlay">
-                        <div className='actionText'> Connecting to your facebook account</div>
-                    </div>
-                )}
+            <div className="container h-screen">
+                <div className="flex mx-auto min-h-full flex-col justify-center items-center px-6 py-12 lg:px-8">
+                    <div className="bg-white w-[33%] py-10 rounded-3xl">
+                        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+                            <h2 className="mt-4 text-center text-2xl font-bold leading-9 tracking-tight text-gray-700">Facebook
+                                Page Integration</h2>
+                        </div>
 
-                <div className='fbLoginBox'>
-                    <div>
-                        Facebook Page Integration
-                    </div>
-                    {pageStatus === 'default' ?
-                        (
-                            <FacebookLogin
-                                appId={appId}
-                                onSuccess={handleResponse}
-                                onFail={(error) => {
-                                    alert("Could not connect to facebook at the moment! Please Contact the app owner.")
-                                    console.log('Login Failed!', error);
-                                }}
-                                onProfileSuccess={(response) => {
-                                    console.log('Get Profile Success!', response);
-                                }}
-                                initParams={{
-                                    version: 'v16.0',
-                                    xfbml: true,
-                                }}
-                                loginOptions={{
-                                    return_scopes: true,
-                                }}
-                            />
-                        ) : (
-                            <>
-                                <div className={`my-component ${loading ? 'loading' : ''}`}>
-                                    <div className={`facebook-connection-screen container mt-5 content`}>
-
-                                        {loading && (
-                                            <div className="loading-overlay">
-                                                <div className='actionText'> {action} </div>
-                                            </div>
+                        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                            {pageStatus === 'default' ?
+                                (
+                                    <FacebookLogin
+                                        appId={appId}
+                                        scope="pages_show_list,pages_messaging,pages_read_engagement,pages_manage_metadata"
+                                        onSuccess={handleResponse}
+                                        onFail={(error) => {
+                                            alert("Could not connect to facebook at the moment! Please Contact the app owner.")
+                                            console.log('Login Failed!', error);
+                                        }}
+                                        onProfileSuccess={updateProfile}
+                                        initParams={{
+                                            version: 'v16.0',
+                                            xfbml: true,
+                                        }}
+                                        loginOptions={{
+                                            return_scopes: true,
+                                        }}
+                                        render={(renderProps) => (
+                                            <Button
+                                                onClick={renderProps.onClick}
+                                                className="w-full bg-blue-800 p-4 text-white rounded-xl"
+                                            >
+                                                Connect Page
+                                            </Button>
                                         )}
-
-                                        {notConnectedPages.length > 0 && (
-                                            <div className='available-pages-div'>
-                                                <div className='head-div'>Available Pages</div>
-                                                <div className='available-pages'>
-                                                    {notConnectedPages.map((page: AccountPageResponse) => (
-                                                        <div className='page-box' key={page.id}>
-                                                            <div>Page: <span className='page-name'>{page.name} </span>
-                                                            </div>
-                                                            <div className='btn navigate-btn' onClick={() => {
-                                                                setAction("Connecting Page")
-                                                                setLoading(true);
-                                                                setTimeout(() => {
-                                                                    handlePageConnect(page)
-                                                                }, 2000);
-                                                            }
-                                                            }
-                                                            >
-                                                                Connect Page
-
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-
-                                        <div className='connected-pages-div'>
-
-                                            <div className='head-div'>Facebook Page Integration</div>
-                                            <div className='connected-pages'>
-                                                {connectedPages.length === 0 && <div> No Page Connected </div>}
-                                                {connectedPages.map((page: PageResponse) => (
-                                                    <div key={page.pageId}>
-                                                        <div className='page-box'>
-                                                            <div>Integrated Page: <span
-                                                                className='page-name'>{page.name} </span></div>
-                                                            <div>
-                                                                <div className='btn delete-btn'
-                                                                     onClick={() => {
-                                                                         setAction("Deleting Page")
-                                                                         setLoading(true);
-                                                                         setTimeout(() => {
-                                                                             disconnectPage(page.pageId)
-                                                                         }, 2000);
-                                                                     }
-                                                                     }
-                                                                >
-                                                                    Delete Integration
-
+                                    />
+                                ) : (
+                                    <>
+                                        <div
+                                            className="flex mx-auto min-h-full flex-col justify-center items-center px-6 py-6">
+                                            {notConnectedPages.length > 0 && (
+                                                <>
+                                                    <h4 className="mt-4 text-center text-xl font-bold leading-9 tracking-tight text-gray-700">Available
+                                                        Pages</h4>
+                                                    <div className='flex-col'>
+                                                        {notConnectedPages.map((page: AccountPageResponse) => (
+                                                            <div key={page.id}>
+                                                                <div className="font-bold">
+                                                                    Page: <span
+                                                                    className='font-medium'>{page.name} </span>
                                                                 </div>
-                                                                <Link className='btn navigate-btn'
+                                                                <Button
+                                                                    onClick={() => {
+                                                                        setAction("Connecting Page")
+                                                                        setLoading(true);
+                                                                        setTimeout(() => {
+                                                                            handlePageConnect(page)
+                                                                        }, 2000);
+                                                                    }
+                                                                    }
+                                                                >
+                                                                    Connect Page
 
-                                                                      onClick={() => {
-                                                                          setAction("Loading Conversations")
-                                                                          setLoading(true);
-                                                                      }
-                                                                      }
-                                                                      href={'/agent/' + page.pageId}>
-                                                                    Reply to Messages
-
-                                                                </Link>
+                                                                </Button>
                                                             </div>
-                                                        </div>
+                                                        ))}
                                                     </div>
-                                                ))}
-                                            </div>
+                                                </>
+                                            )}
+                                            {connectedPages.map((page: PageResponse) => (
+                                                <div key={page.pageId}>
+                                                    <div>
+                                                        <p className="text-center text-gray-700 leading-9 text-lg font-medium">Integrated
+                                                            Page: <span
+                                                                className="font-bold">{page.name} </span></p>
+                                                    </div>
+                                                    <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                                                        <button type="button"
+                                                                onClick={() => {
+                                                                    setAction("Deleting Page")
+                                                                    setLoading(true);
+                                                                    setTimeout(() => {
+                                                                        disconnectPage(page.pageId)
+                                                                    }, 2000);
+                                                                }}
+                                                                className="flex w-full justify-center rounded-md bg-red-600 px-3 py-3 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-700">Delete
+                                                            Integration
+                                                        </button>
+                                                        <Link className='btn navigate-btn' onClick={() => {
+                                                            setAction("Loading Conversations")
+                                                            setLoading(true);
+                                                        }
+                                                        }
+                                                              href={'/agent/' + page.pageId}>
 
+                                                            <Button>Reply To Messages</Button>
+                                                        </Link>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
-                                    </div>
-                                </div>
-                            </>
-                        )
-                    }
-
+                                    </>
+                                )
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </>

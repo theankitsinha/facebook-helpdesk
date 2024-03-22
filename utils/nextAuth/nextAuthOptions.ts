@@ -4,9 +4,9 @@ import {comparePassword} from "@/lib/bcrypt";
 
 export const nextAuthOptions = {
     pages: {
-        signIn: '/auth/login',
-        newUser: "/auth/register",
-        error: '/auth/login',
+        signIn: '/login',
+        newUser: "/register",
+        error: '/login',
     },
     providers: [
         CredentialsProvider({

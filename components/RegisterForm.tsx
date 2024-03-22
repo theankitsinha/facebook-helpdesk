@@ -4,8 +4,12 @@ import {useForm} from "react-hook-form";
 import {RegisterFormData, RegisterFormSchema, ValidFieldNames} from "@/types/form";
 import FormField from "@/components/FormField";
 import {zodResolver} from "@hookform/resolvers/zod";
+import Button from "@/components/ui/button";
+import {useRouter} from "next/navigation";
 
 export default function RegisterForm() {
+    const router = useRouter();
+
     const [loading, setLoading] = useState(false);
     const {
         register,
@@ -38,7 +42,7 @@ export default function RegisterForm() {
                 body: JSON.stringify(data)
             });
             if (!response.ok) {
-                console.log(response.statusText)
+                console.log(response);
             }
             const {success, errors, user}: { success: boolean, errors: any, user: any } = await response.json();
             // Define a mapping between server-side field names and their corresponding client-side names
@@ -59,13 +63,16 @@ export default function RegisterForm() {
                     message: errors[fieldWithError],
                 });
             }
+            if (success) {
+                router.push('/login');
+            }
         } catch (error) {
             alert("Submitting form failed!");
         }
     };
     return (
         <>
-            <form className='auth-form' onSubmit={handleSubmit(onSubmit)}>
+            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                 <FormField
                     label="Name"
                     type="text"
@@ -98,9 +105,9 @@ export default function RegisterForm() {
                     register={register}
                     error={errors.confirmPassword}
                 />
-                <button className='auth-button' type="submit" disabled={loading}>
-                    {!loading ? "Sign Up" : "Loading"}
-                </button>
+                <div>
+                    <Button type="submit" disabled={loading}>{!loading ? "Sign Up" : "Loading"}</Button>
+                </div>
             </form>
         </>
 
