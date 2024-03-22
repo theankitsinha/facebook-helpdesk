@@ -36,12 +36,24 @@ export const POST = async (req: Request, res: Response) => {
                 const senderId = entry?.messaging[0]?.sender?.id;
                 const pageId = entry?.messaging[0]?.recipient?.id;
                 const message = entry?.messaging[0]?.message?.text;
+                const getPageId = await prisma.facebookPage.findFirst({
+                    where: {
+                        pageId: pageId
+                    },
+                    select: {
+                        id: true,
+                    }
+                });
+                if (!getPageId) {
+                    console.error("Page Not Found ID: " + pageId);
+                    return new NextResponse('PAGE_NOT_ADDED', {status: 404});
+                }
                 const insertIntoDB = await prisma.message.create({
                     data: {
                         message: message,
                         senderId: senderId,
                         facebookUserId: senderId,
-                        pageId: pageId,
+                        pageId: getPageId.id,
                         // userId: userId
                     }
                 });
