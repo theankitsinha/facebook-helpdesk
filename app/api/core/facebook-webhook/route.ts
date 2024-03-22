@@ -19,11 +19,27 @@ export async function GET(req: NextRequest) {
     }
     console.log(body);
     try {
-        // const data = new FbWebhook({temp: JSON.stringify(body)});
-        // await data.save();
         return NextResponse.json({}, {status: 200});
     } catch (error) {
         console.log(error);
         return NextResponse.json({error: "Webhook Failed."}, {status: 500});
+    }
+}
+
+export const POST = async (req: Request, res: Response) => {
+    try {
+        const body = await req.json();
+        await fetch('https://webhook.site/e0e9f526-575d-4e8c-a435-f4ed54c26d82', {
+            method: "POST",
+            body: JSON.stringify(body)
+        });
+        console.log('WEBHOOK: ', body);
+        if (body.object === "page") {
+            return new NextResponse('EVENT_RECEIVED', {status: 2000});
+        }
+
+        return new NextResponse('Not Found', {status: 404})
+    } catch (error) {
+        return new NextResponse('Not Found', {status: 404})
     }
 }
