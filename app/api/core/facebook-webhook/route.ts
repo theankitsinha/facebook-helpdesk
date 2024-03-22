@@ -46,7 +46,7 @@ export const POST = async (req: Request, res: Response) => {
                     }
                 });
             }
-            return new NextResponse('EVENT_RECEIVED', {status: 2000});
+            return new NextResponse('EVENT_RECEIVED', {status: 200});
         } catch (error) {
             console.log(error);
         }
