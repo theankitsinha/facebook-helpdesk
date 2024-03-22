@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
         if (mode === "subscribe" && token === "f@cBo0K-t0keN") {
             return NextResponse.json(Number(challenge), {status: 200});
         } else {
-            return NextResponse.json({message: "!"}, {status: 403});
+            return NextResponse.json({message: "This mode not supported!"}, {status: 403});
         }
     }
     // Duplicate check
